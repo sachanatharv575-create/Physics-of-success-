@@ -1,12 +1,264 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>My Website</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Physics of Purpose</title>
+    <link href="https://googleapis.com" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0b0f19;
+            --bg-secondary: #131a26;
+            --accent-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-orange: #f97316;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --border-color: #222f43;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        header {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 80px 24px 40px;
+            text-align: center;
+        }
+        .badge {
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(6, 182, 212, 0.1);
+            color: var(--accent-cyan);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #fff, #9ca3af);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 16px;
+            letter-spacing: -1px;
+        }
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto 40px;
+            font-weight: 300;
+        }
+        .simulation-container {
+            max-width: 900px;
+            margin: 0 auto 60px;
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        .sim-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+        }
+        .controls {
+            display: flex;
+            gap: 12px;
+        }
+        .btn {
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+        }
+        .btn:hover {
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+        }
+        canvas {
+            width: 100%;
+            background-color: #070a10;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.05);
+            display: block;
+        }
+        main {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 24px 100px;
+        }
+        .section-title {
+            font-size: 1.8rem;
+            margin-bottom: 32px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+            font-weight: 600;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 60px;
+        }
+        .card {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 32px;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+        .card-icon {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent-blue);
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-bottom: 16px;
+            display: block;
+        }
+        .card-cyan .card-icon { color: var(--accent-cyan); }
+        .card-orange .card-icon { color: var(--accent-orange); }
+        .card:hover::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 3px;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
+        }
+        h3 {
+            font-size: 1.3rem;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+        .card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            font-weight: 300;
+        }
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        footer {
+            text-align: center;
+            padding: 40px 24px;
+            border-top: 1px solid var(--border-color);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        @media (max-width: 768px) {
+            h1 { font-size: 2.2rem; }
+            .grid { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
-<body style="font-family: Arial; text-align:center; background:#f2f2f2;">
-
-  <h1>Welcome to My Website 🚀</h1>
-  <p>This is my first GitHub Pages site.</p>
-
-</body>
-</html>
+<body>
+    <header>
+        <div class="badge">Framework v1.0 // Physics × Philosophy</div>
+        <h1>The Physics of Purpose</h1>
+        <p class="subtitle">A mathematical mental model mapping personal vector mechanics, progress tracking, and displacement optimization.</p>
+    </header>
+    <section class="simulation-container">
+        <div class="sim-header">
+            <span style="color: var(--text-muted);">// Visualizing Vector Mechanics</span>
+            <div class="controls">
+                <button class="btn" id="startBtn">Simulate Journey</button>
+            </div>
+        </div>
+        <canvas id="physicsCanvas" width="800" height="300"></canvas>
+    </section>
+    <main>
+        <h2 class="section-title reveal">01. Vector Paths & Trajectories</h2>
+        <div class="grid reveal">
+            <div class="card">
+                <span class="card-icon">⚡ VECTOR DISPLACEMENT</span>
+                <h3>The Path of Action</h3>
+                <p>The shortest distance between static intent (Point A) and absolute objective (Point B) is a straight, focused path. It eliminates structural chaos to build clean, immediate progress.</p>
+            </div>
+            <div class="card card-cyan">
+                <span class="card-icon">🌀 CHAOTIC DISTANCE</span>
+                <h3>The Cost of Distraction</h3>
+                <p>Allowing emotional fluctuations and external noise bends your trajectory into a wavy, high-friction line. While the starting and endpoints match, your total distance and execution time escalate exponentially.</p>
+            </div>
+        </div>
+        <h2 class="section-title reveal">02. Velocity Over Friction</h2>
+        <div class="grid reveal">
+            <div class="card card-orange">
+                <span class="card-icon">⚙️ STATIC FRICTION</span>
+                <h3>The Launch Threshold</h3>
+                <p>System inertia is highest right before momentum is achieved. It takes far more concentrated torque to commit to writing your first string of code than it does to maintain a fluid state of focus.</p>
+            </div>
+            <div class="card">
+                <span class="card-icon">📉 NEGATIVE ACCELERATION</span>
+                <h3>Eliminating Drag</h3>
+                <p>Distractions function identically to physical deceleration forces. Every context-switch, micro-diversion, or unnecessary detour works against your engine speed, stretching out your delivery timelines.</p>
+            </div>
+        </div>
+    </main>
+    <footer>
+        Designed & Formulated around Core Kinematic Models.
+    </footer>
+    <script>
+        const canvas = document.getElementById('physicsCanvas');
+        const ctx = canvas.getContext('2d');
+        const startBtn = document.getElementById('startBtn');
+        let animationFrameId;
+        let progress = 0;
+        let isSimulating = false;
+        const startPoint = { x: 80, y: 150 };
+        const endPoint = { x: 720, y: 150 };
+        function drawBaseDiagram() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.font = '12px "JetBrains Mono", monospace';
+            ctx.fillStyle = '#9ca3af';
+            ctx.fillText('Point A (Current Position)', startPoint.x - 40, startPoint.y - 25);
+            ctx.fillText('Point B (Target Goal)', endPoint.x - 60, endPoint.y - 25);
+            ctx.fillStyle = '#3b82f6';
+            ctx.beginPath(); ctx.arc(startPoint.x, startPoint.y, 6, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#06b6d4';
+            ctx.beginPath(); ctx.arc(endPoint.x, endPoint.y, 6, 0, Math.PI * 2); ctx.fill();
+            ctx.strokeStyle = 'rgba(59, 130, 246, 0.25)';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([]);
+            ctx.beginPath();
+            ctx.moveTo(startPoint.x, startPoint.y);
+            ctx.lineTo(endPoint.x, endPoint.y);
+            ctx.stroke();
+            ctx.strokeStyle = 'rgba(6, 182, 212, 0.3)';
+            ctx.lineWidth = 2;
+      
